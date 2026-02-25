@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Oxford 3000/5000</title>
+</head>
+<body>
+  <!-- 原 README.md 内容转为 HTML 后的结构 -->
+  <p>abandon <a href="audio/abandon.mp3">🔊</a></p>
+  <p>ability <a href="audio/ability.mp3">🔊</a></p>
+
+  <!-- 核心脚本：拦截音频链接并播放 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 匹配所有音频链接（可根据实际后缀调整）
+      const audioSelectors = 'a[href$=".mp3"], a[href$=".wav"], a[href*="github.com/.*audio"]';
+      const audioLinks = document.querySelectorAll(audioSelectors);
+
+      audioLinks.forEach(link => {
+        // 标记为音频链接，方便样式区分
+        link.style.cursor = 'pointer';
+        link.addEventListener('click', function(e) {
+          e.preventDefault(); // 阻止跳转
+          const audioSrc = this.href;
+          
+          // 停止上一个音频（可选，避免同时播放多个）
+          if (window.currentAudio) {
+            window.currentAudio.pause();
+          }
+          
+          // 创建并播放新音频
+          window.currentAudio = new Audio(audioSrc);
+          window.currentAudio.play().catch(err => {
+            console.warn('自动播放失败，尝试降级处理:', err);
+            // 降级方案：新开标签页（仅当自动播放失败时）
+            window.open(audioSrc, '_blank');
+          });
+        });
+      });
+    });
+  </script>
+</body>
+</html>
